@@ -1,9 +1,12 @@
 ### This is iDOL vs ETH swap 
+- Basic structure is the same as other Fairswaps (Fairswap_iDOLvsLBT, Fairswap_iDOLvsLien, Fairswap_OPYN)
+
+## Some differences from other Fairswaps
+- Fee transfer to lien token is paid in both ETH and eth(iDOL)
+- Fee for lientoken can be transfered to lien token anytime
+
 ## Test
 - When you execute test, try using `ganache-cli -b 1` to execute `Promise.all(orders)`
-## Characteristics
-- Fee transfer to lien token pays in both ETH and eth(iDOL)
-- Fee for lientoken can transfer to lien token anytime
 
 ## interfaces
 ### functions about deployment
