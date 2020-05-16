@@ -85,10 +85,6 @@ contract BoxExchange {
     IERC20 token;
 
     /// MODIFIERS
-    modifier exchangeInitialized() {
-        require((share.totalSupply() > 0 && ethPool > 0 && tokenPool > 0), "exchange is not initialized");
-        _;
-    }
 
     modifier onlyLienToken {
         require(msg.sender == lienTokenAddress, "Only LienToken can call this function.");
@@ -301,7 +297,6 @@ contract BoxExchange {
         // if initial price is within the TORELANCE_RATE, return initial price and execute all orders
         if(price >= lowPrice && price <= highPrice){
             _calculatePool(buyAmount.add(buyAmountLimit), sellAmount.add(sellAmountLimit), price);
-            _calculateTokenForLien(buyAmount.add(buyAmountLimit), sellAmount.add(sellAmountLimit));
             return (price, 0, 0, 0, 0);
         } else if(price < lowPrice){
             //executeAmount is amount of buy orders when the price is lower than lowPrice (initial price * 0.999)
@@ -310,7 +305,6 @@ contract BoxExchange {
             if(executeAmount > buyAmount){
                 uint256 refundRate = (buyAmount.add(buyAmountLimit).sub(executeAmount)).decimalDiv(buyAmountLimit);
                 _calculatePool(executeAmount, sellAmount.add(sellAmountLimit), lowPrice);
-                _calculateTokenForLien(executeAmount, sellAmount.add(sellAmountLimit));
                 return(lowPrice, 0, refundRate.decimalMul(DECIMAL + FEE_RATE), 0, 0);
             } else {// refumd all limit buy orders
                 //update lowPrice to SECURE_RATE
@@ -322,14 +316,12 @@ contract BoxExchange {
                     if(executeAmount < buyAmount){
                         uint256 refundRate = (buyAmount.sub(executeAmount)).decimalDiv(buyAmount);
                         _calculatePool(executeAmount, sellAmount.add(sellAmountLimit), lowPrice);
-                        _calculateTokenForLien(executeAmount, sellAmount.add(sellAmountLimit));
                         return(lowPrice, refundRate.decimalMul(DECIMAL + FEE_RATE), (DECIMAL + FEE_RATE), 0, 0);
                     }else{
                         // execute all no-limit buy orders and refund all limit buy orders
                         // update price
                         price = ((tokenPool.mul(DECIMAL)).add(sellAmount).add(sellAmountLimit)).decimalDiv((ethPool.mul(DECIMAL)).add(buyAmount));
                          _calculatePool(buyAmount, sellAmount.add(sellAmountLimit), price);
-                         _calculateTokenForLien(buyAmount, sellAmount.add(sellAmountLimit));
                         return(price, 0, DECIMAL + FEE_RATE, 0, 0);
                     }
                 }else{
@@ -337,7 +329,6 @@ contract BoxExchange {
                     // update price
                     price = ((tokenPool.mul(DECIMAL)).add(sellAmount).add(sellAmountLimit)).decimalDiv((ethPool.mul(DECIMAL)).add(buyAmount));
                      _calculatePool(buyAmount, sellAmount.add(sellAmountLimit), price);
-                     _calculateTokenForLien(buyAmount, sellAmount.add(sellAmountLimit));
                     return(price, 0, DECIMAL + FEE_RATE, 0, 0);
                 }
             }
@@ -348,7 +339,6 @@ contract BoxExchange {
                  //if executeAmount > sellAmount, (sellAmount - executeAmount) in limit order will be executed
                 uint256 refundRate = (sellAmount.add(sellAmountLimit).sub(executeAmount)).decimalDiv(sellAmountLimit);
                 _calculatePool(buyAmount.add(buyAmountLimit), executeAmount, highPrice);
-                _calculateTokenForLien(buyAmount.add(buyAmountLimit), executeAmount);
                 return (highPrice, 0, 0, 0, refundRate.decimalMul(DECIMAL + FEE_RATE));
             } else {// refumd all limit sell orders
                 //update highPrice to SECURE_RATE
@@ -360,13 +350,11 @@ contract BoxExchange {
                     if(executeAmount < sellAmount){
                         uint256 refundRate = (sellAmount.sub(executeAmount)).decimalDiv(sellAmount);
                         _calculatePool(buyAmount.add(buyAmountLimit), executeAmount, highPrice);
-                        _calculateTokenForLien(buyAmount.add(buyAmountLimit), executeAmount);
                         return (highPrice, 0, 0, refundRate.decimalMul(DECIMAL + FEE_RATE), DECIMAL + FEE_RATE);
                     }else{// execute all no-limit sell orders and refund all limit sell orders
                         // update price
                         price = ((tokenPool.mul(DECIMAL)).add(sellAmount)).decimalDiv((ethPool.mul(DECIMAL)).add(buyAmount).add(buyAmountLimit));
                         _calculatePool(buyAmount.add(buyAmountLimit), sellAmount, price);
-                        _calculateTokenForLien(buyAmount.add(buyAmountLimit), sellAmount);
                         return (price, 0, 0, 0, DECIMAL + FEE_RATE);
                 }
                 }else{
@@ -374,7 +362,6 @@ contract BoxExchange {
                     // update price
                     price = ((tokenPool.mul(DECIMAL)).add(sellAmount)).decimalDiv((ethPool.mul(DECIMAL)).add(buyAmount).add(buyAmountLimit));
                     _calculatePool(buyAmount.add(buyAmountLimit), sellAmount, price);
-                    _calculateTokenForLien(buyAmount.add(buyAmountLimit), sellAmount);
                     return (price, 0, 0, 0, DECIMAL + FEE_RATE);
                 }
             }
@@ -386,6 +373,7 @@ contract BoxExchange {
     function _calculatePool(uint256 buyAmount, uint256 sellAmount, uint256 price) private{
          uint256 decimalethPool = ethPool.mul(DECIMAL);
          uint256 decimaltokenPool = tokenPool.mul(DECIMAL);
+         _calculateTokenForLien(buyAmount, sellAmount);
          ethPool = (decimalethPool.add(buyAmount.decimalMul(DECIMAL + (FEE_RATE.decimalMul(POOL_RATE)))).sub(sellAmount.decimalDiv(price))).div(DECIMAL);
          tokenPool = (decimaltokenPool.add(sellAmount.decimalMul(DECIMAL + (FEE_RATE.decimalMul(POOL_RATE)))).sub(buyAmount.decimalMul(price))).div(DECIMAL);
     }
@@ -444,14 +432,16 @@ function _executionOrders() private {
         
         emit Price(length[0], length[1], length[2], length[3], length[4]);
         
-        if(category == 1){k = unexecuted;}else{k = 0;}
-        _paymentBuy(k, length[0], price, refundBuy0, buyers0, Exchange[nextExecuteBoxNumber].buyOrders);
+         if(category == 1){k = unexecuted;}else{k = 0;}
+        _payment(k, length[0], price, refundBuy0, true, buyers0, Exchange[nextExecuteBoxNumber].buyOrders);
+
         if(category == 2){k = unexecuted;}else{k = 0;}
-        _paymentBuy(k, length[1], price, refundBuy1, buyers1, Exchange[nextExecuteBoxNumber].buyOrdersLimit);
+        _payment(k, length[1], price, refundBuy1, true, buyers1, Exchange[nextExecuteBoxNumber].buyOrdersLimit);
         if(category == 3){k = unexecuted;}else{k = 0;}
-        _paymentSell(k, length[2], price, refundSell0, sellers0, Exchange[nextExecuteBoxNumber].sellOrders);
+        _payment(k, length[2], price, refundSell0, false, sellers0, Exchange[nextExecuteBoxNumber].sellOrders);
+
         if(category == 4){k = unexecuted;}else{k = 0;}
-        _paymentSell(k, length[3], price, refundSell1, sellers1, Exchange[nextExecuteBoxNumber].sellOrdersLimit);
+        _payment(k, length[3], price, refundSell1, false, sellers1, Exchange[nextExecuteBoxNumber].sellOrdersLimit);
         
         if(length[4] == 0){
             // increment nextExecuteBoxNumber
@@ -471,56 +461,33 @@ function _executionOrders() private {
 
     }
 
-    //send tokens of buy order
+    //send tokens of order
     //orders are executed from _start to _end
-    function _paymentBuy(uint _start, uint _end, uint _price, uint _refundRate,
-                         address payable[] memory orderers, 
-                         mapping(address => uint) storage buyOrders) 
+    function _payment(uint _start, uint _end, uint _price, uint _refundRate, bool _isBuy,
+                         address payable[] memory orderers,
+                         mapping(address => uint) storage orders) 
                          private {
         if(_end > 0){
-            if (_refundRate > 0){
-                for (uint256 i = _start; i < _end; i++) {
-                address payable orderer = orderers[i];
-                uint256 refundAmount = _refundRate.decimalMul(buyOrders[orderer]);
-                if(_refundRate < DECIMAL){
-                    require(token.transfer(orderer, (buyOrders[orderer].sub(refundAmount)).decimalMul(_price)), "send token error");
-                }
-                orderer.transfer(refundAmount);
-                
-                }   
-            } else{
-                for (uint256 i = _start; i < _end; i++) {
-                address payable orderer = orderers[i];
-                require(token.transfer(orderer, (buyOrders[orderer]).decimalMul(_price)), "send token error");         
-                } 
-            }
-        }
-    }
-
-    //send tokens of sell order
-    //orders are executed from _start to _end
-    function _paymentSell(uint _start, uint _end, uint _price, uint _refundRate,
-                         address payable[] memory orderers, 
-                         mapping(address => uint) storage sellOrders)
-                         private {
-        if(_end > 0){
-            if (_refundRate > 0){
-                for (uint256 i = _start; i < _end; i++) {
-                address payable orderer = orderers[i];
-                uint256 refundAmount = _refundRate.decimalMul(sellOrders[orderer]);
-                require(token.transfer(orderer, refundAmount), "refund token error");
-                if(_refundRate < DECIMAL){
-                    orderer.transfer((sellOrders[orderer].sub(refundAmount)).decimalDiv(_price));
-                }
-                
-                }   
-            } else{
                 for (uint256 i = _start; i < _end; i++) {
                     address payable orderer = orderers[i];
-                    orderer.transfer((sellOrders[orderer]).decimalDiv(_price));         
-                } 
+                    uint256 refundAmount = _refundRate.decimalMul(orders[orderer]);
+                    if(_isBuy){
+                        if(_refundRate < DECIMAL){
+                            require(token.transfer(orderer, (orders[orderer].sub(refundAmount)).decimalDiv(_price)), "Send error");
+                        }
+                        if (_refundRate > 0){ //if refundrate > 0, refund baseToken
+                            orderer.transfer(refundAmount);
+                        }
+                    } else {
+                        if(_refundRate < DECIMAL){
+                            orderer.transfer((orders[orderer].sub(refundAmount)).decimalDiv(_price));
+                        }
+                        if (_refundRate > 0){ //if refundrate > 0, refund baseToken
+                            require(token.transfer(orderer, refundAmount), "Refund error");
+                        }
+                    }     
             }
-        }
+        }  
     }
 
     //count number of addresses of execution in this transaction
@@ -574,19 +541,9 @@ function _executionOrders() private {
         return(nextBoxNumber, ethPool, tokenPool, 
             share.totalSupply(), ethPool.div(share.totalSupply()), tokenPool.div(share.totalSupply()), buyPrice, sellPrice);
     }
-    
-    function getShare(address user) external view returns (uint256) {
-        return share.balanceOf(user);
-    }
-
     function getTokenAddress() external view returns (address) {
         return tokenAddress;
     }
-    
-    function getTokensForLien() external view returns (uint256, uint256) {
-        return(ethForLien, tokenForLien);
-    }
-
 
     function getTotalShare() external view returns (uint256) {
         return share.totalSupply();
@@ -645,4 +602,12 @@ function _executionOrders() private {
             return (user, Exchange[nextExecuteBoxNumber].sellOrders[user]);
         }
     }
+    
+    function getShare(address user) external view returns (uint256) {
+        return share.balanceOf(user);
+    }
+    function getTokensForLien() external view returns (uint256, uint256) {
+        return(ethForLien, tokenForLien);
+    }
+
 }

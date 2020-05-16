@@ -12,7 +12,6 @@ interface FactoryInterface {
 contract ExchangeFactory is FactoryInterface {
     event ExchangeLaunch(address indexed exchange, address indexed token);
     address payable private lienTokenAddress;
-    address[] public tokenList;
     mapping(address => address) tokenToExchange;
 
     constructor(address payable _lienTokenAddress) public {
@@ -25,7 +24,6 @@ contract ExchangeFactory is FactoryInterface {
         require(_token != address(0) && _token != address(this));
         BoxExchange newExchange = new BoxExchange(_token, lienTokenAddress);
         address exchangeAddress = address(newExchange);
-        tokenList.push(_token);
         tokenToExchange[_token] = exchangeAddress;
         emit ExchangeLaunch(exchangeAddress, _token);
         return exchangeAddress;

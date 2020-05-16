@@ -1,5 +1,15 @@
 ### This is iDOL vs ETH swap 
-- Basic structure is the same as other Fairswaps (Fairswap_iDOLvsLBT, Fairswap_iDOLvsLien, Fairswap_OPYN)
+## What is Fairswap?
+- Uniswap-like exchange with a frontrunning protection for option tokens such as LBT.
+- All trading-orders in some sequential blocks are collected in "Exchange Box" and are executed in one price regardless of the order recorded in a block.
+- User can select Limit order in which funds will be refunded partially or entirely when price moves more than 0.1%, otherwise the order will be executed completely unless price moves more than 5%.
+- In a Fairswap which deals with option tokens that fundamentally has a larger volatility than underlying asset, fee price will be adjusted according to the estimated volatility of the option tokens, which is a quite natural practice in traditional option markets.
+
+## Basic architecture of Fairswap
+![Ex1](./Explanations/Ex7.jpeg)
+![Ex2](./Explanations/Ex2.jpeg)
+![Ex3](./Explanations/Ex3.jpeg)
+![Ex4](./Explanations/Ex4.jpeg)
 
 ## Some differences from other Fairswaps
 - Fee transfer to lien token is paid in both ETH and eth(iDOL)
