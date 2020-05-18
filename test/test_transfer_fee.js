@@ -22,14 +22,14 @@ contract('BoxExchange', function(accounts) {
     });
     it("check fee for lien token", async () => {
       await exchangeInstance.initializeExchange(2000000, { from: LP1, value: 3000000});
-        let process = [exchangeInstance.OrderEthToToken(1685175020, false, {from: buyer1, value: 50000}),
-          exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer2, value: 50000}),
-          exchangeInstance.OrderTokenToEth(1685175020, 20000, false, { from: seller1}),
-          exchangeInstance.OrderTokenToEth(1685175020, 20000, false, { from: seller2}),
+        let process = [exchangeInstance.OrderEthToToken(16, false, {from: buyer1, value: 50000}),
+          exchangeInstance.OrderEthToToken(16, false, { from: buyer2, value: 50000}),
+          exchangeInstance.OrderTokenToEth(16, 20000, false, { from: seller1}),
+          exchangeInstance.OrderTokenToEth(16, 20000, false, { from: seller2}),
                 ];
         await Promise.all(process);
         await time.advanceBlock();
-        await exchangeInstance.OrderTokenToEth(1685175020, 300, true, { from: seller2});
+        await exchangeInstance.OrderTokenToEth(16, 300, true, { from: seller2});
         let tokensForLien = await exchangeInstance.getTokensForLien.call();
         assert.equal(tokensForLien[0], 59, "Invalid amount of BaseToken for Lien token")
         assert.equal(tokensForLien[1], 23, "Invalid amount of SettlementToken for Lien token")
@@ -37,15 +37,15 @@ contract('BoxExchange', function(accounts) {
 
     it("transfer fee to lien correctly", async () => {
       await exchangeInstance.initializeExchange(2000000, {from: LP1, value: 3000000});
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, {from: buyer1, value: 50000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer2, value: 50000}),
-        exchangeInstance.OrderTokenToEth(1685175020, 20000, false, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 20000, false, { from: seller2}),
+      let process = [exchangeInstance.OrderEthToToken(16, false, {from: buyer1, value: 50000}),
+        exchangeInstance.OrderEthToToken(16, false, { from: buyer2, value: 50000}),
+        exchangeInstance.OrderTokenToEth(16, 20000, false, { from: seller1}),
+        exchangeInstance.OrderTokenToEth(16, 20000, false, { from: seller2}),
               ];
       await Promise.all(process);
       await time.advanceBlock();
       await time.advanceBlock();
-      await exchangeInstance.OrderTokenToEth(1685175020, 300, true, { from: seller2});
+      await exchangeInstance.OrderTokenToEth(16, 300, true, { from: seller2});
       await exchangeInstance.sendFeeToLien({from: factory});
       let ethBalance = await web3.eth.getBalance(lientokenInstance.address);
       assert.equal(ethBalance, 59, "Invalid eth amount lientoken will receive")

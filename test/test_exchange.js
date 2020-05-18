@@ -43,10 +43,10 @@ contract('BoxExchange', function(accounts) {
       await tokenInstance.approve(exchangeInstance.address, 20000, { from: seller1 });
       await tokenInstance.approve(exchangeInstance.address, 20000, { from: seller2 });
       
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, {from: buyer1, value: eth}),
-          exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: eth}),
-          exchangeInstance.OrderTokenToEth(1685175020, 20000, false, { from: seller1}),
-          exchangeInstance.OrderTokenToEth(1685175020, 20000, true, { from: seller2}),
+      let process = [exchangeInstance.OrderEthToToken(16, false, {from: buyer1, value: eth}),
+          exchangeInstance.OrderEthToToken(16, true, { from: buyer2, value: eth}),
+          exchangeInstance.OrderTokenToEth(16, 20000, false, { from: seller1}),
+          exchangeInstance.OrderTokenToEth(16, 20000, true, { from: seller2}),
               ];     
       await Promise.all(process);
       let summary = await exchangeInstance.getBoxSummary.call();
@@ -78,222 +78,17 @@ contract('BoxExchange', function(accounts) {
       await exchangeInstance.initializeExchange(40000, { from: LP1, value: web3.utils.toWei("2", 'ether')});
       const eth = web3.utils.toWei("1", 'ether');
       await tokenInstance.approve(exchangeInstance.address, 20000, { from: LP2 });
-      await exchangeInstance.removeLiquidity(1685175020, 1000, 2000,  500, { from: LP1})
+      await exchangeInstance.removeLiquidity(16, 1000, 2000,  500, { from: LP1})
       let LP1Data = await exchangeInstance.getShare.call(LP1);
       assert.equal(LP1Data.valueOf(), 500 * DECIMAL, "LP1 burns 500 shares");
 
-      await exchangeInstance.addLiquidity(1685175020, 50, { from: LP2, value: eth});
+      await exchangeInstance.addLiquidity(16, 50, { from: LP2, value: eth});
       let LP2Data = await exchangeInstance.getShare.call(LP2);
       assert.equal(LP2Data.valueOf(), 500 * DECIMAL, "LP2 gets 100 shares");
 
       let totalshare = await exchangeInstance.getTotalShare.call();
       assert.equal(totalshare.valueOf(), 1000 * DECIMAL, "LP2 gets 100 shares");
     });
-
-//buy
-    it("price is inner tolerance rate", async () => {
-      await exchangeInstance.initializeExchange(100000, { from: LP1, value: 200000});
-
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer1, value: 200}),
-                exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 200}),
-                exchangeInstance.OrderTokenToEth(1685175020, 150, false, { from: seller1}),
-                exchangeInstance.OrderTokenToEth(1685175020, 150, true, { from: seller2}),
-              ];
-      await Promise.all(process);
-      await time.advanceBlock();
-      let receipt = await exchangeInstance.OrderEthToToken(1685175020, 0, { from: buyer1, value: 10000});
-      assert.equal(receipt.logs[0].args.Price, 500497512437810940, "Invalid price");
-      assert.equal(receipt.logs[0].args.refundRateBuy0, 0, "Invalid refundRate of buy order");
-      assert.equal(receipt.logs[0].args.refundRateBuy1, 0, "Invalid refundRate of buy limit order");
-      assert.equal(receipt.logs[0].args.refundRateSell0, 0, "Invalid refundRate of sell order");
-      assert.equal(receipt.logs[0].args.refundRateSell1, 0, "Invalid refundRate of sell limit order");
-      assert.equal(receipt.logs[1].args.ethpool, 199802, "Invalid baseToken Pool");
-      assert.equal(receipt.logs[1].args.tokenpool, 100100, "Invalid settlementToken Pool");
-    });
-
-
-    it("over tolerance rate, buy limit order is refunded partially", async () => {
-      await exchangeInstance.initializeExchange(100000, { from: LP1, value: 200000});
-    
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer1, value: 150}),
-                exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 700}),
-                exchangeInstance.OrderTokenToEth(1685175020, 150, false, { from: seller1}),
-                exchangeInstance.OrderTokenToEth(1685175020, 100, true, { from: seller2}),
-              ];
-      await Promise.all(process);
-      
-      await time.advanceBlock();
-      await time.advanceBlock();
-      let receipt = await exchangeInstance.OrderEthToToken(1685175020, 0, { from: buyer1, value: 10000});
-      assert.equal(receipt.logs[0].args.Price, 499500000000000000, "Invalid price");
-      assert.equal(receipt.logs[0].args.refundRateBuy0, 0, "Invalid refundRate of buy order");
-      assert.equal(receipt.logs[0].args.refundRateBuy1, 213063992563992580, "Invalid refundRate of buy limit order");
-      assert.equal(receipt.logs[0].args.refundRateSell0, 0, "Invalid refundRate of sell order");
-      assert.equal(receipt.logs[0].args.refundRateSell1, 0, "Invalid refundRate of sell limit order");
-      assert.equal(receipt.logs[1].args.ethpool, 200201, "Invalid baseToken Pool");
-      assert.equal(receipt.logs[1].args.tokenpool, 99900, "Invalid settlementToken Pool");
-    });
-
-    it("over tolerance, sell limit order is refunded all", async () => {
-      await exchangeInstance.initializeExchange(100000, { from: LP1, value: 200000});
-    
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer1, value: 750}),
-                exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 400}),
-                exchangeInstance.OrderTokenToEth(1685175020, 100, false, { from: seller1}),
-                exchangeInstance.OrderTokenToEth(1685175020, 150, true, { from: seller2}),
-              ];
-
-      await Promise.all(process);
-      
-      await time.advanceBlock();
-      await time.advanceBlock();
-      let receipt = await exchangeInstance.OrderEthToToken(1685175020, 0, { from: buyer1, value: 10000});
-      
-      assert.equal(receipt.logs[0].args.Price, 499379190464365500, "Invalid price");
-      assert.equal(receipt.logs[0].args.refundRateBuy0, 0, "Invalid refundRate of buy order");
-      assert.equal(receipt.logs[0].args.refundRateBuy1,1003000000000000000, "Invalid refundRate of buy limit order");
-      assert.equal(receipt.logs[0].args.refundRateSell0, 0, "Invalid refundRate of sell order");
-      assert.equal(receipt.logs[0].args.refundRateSell1, 0, "Invalid refundRate of sell limit order");
-
-      assert.equal(receipt.logs[1].args.ethpool,200250, "Invalid baseToken Pool");
-      assert.equal(receipt.logs[1].args.tokenpool, 99876, "Invalid settlementToken Pool");
-    })
-      
-      
-    it("over tolerance, sell limit order is refunded partially", async () => {
-      await exchangeInstance.initializeExchange(100000, { from: LP1, value: 200000});
-    
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer1, value: 150}),
-                exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 100}),
-                exchangeInstance.OrderTokenToEth(1685175020, 100, false, { from: seller1}),
-                exchangeInstance.OrderTokenToEth(1685175020, 150, true, { from: seller2}),
-              ];
-
-      await Promise.all(process);
-      
-      await time.advanceBlock();
-      await time.advanceBlock();
-      let receipt = await exchangeInstance.OrderEthToToken(1685175020, 0, { from: buyer1, value: 10000});
-      
-      assert.equal(receipt.logs[0].args.Price, 500500000000000000, "Invalid price");
-      assert.equal(receipt.logs[0].args.refundRateBuy0, 0, "Invalid refundRate of buy order");
-      assert.equal(receipt.logs[0].args.refundRateBuy1, 0, "Invalid refundRate of buy limit order");
-      assert.equal(receipt.logs[0].args.refundRateSell0, 0, "Invalid refundRate of sell order");
-      assert.equal(receipt.logs[0].args.refundRateSell1, 164324833333333340, "Invalid refundRate of sell limit order");
-      assert.equal(receipt.logs[1].args.ethpool, 199800, "Invalid baseToken Pool");
-      assert.equal(receipt.logs[1].args.tokenpool, 100100,  "Invalid settlementToken Pool");
-    })
-    
-    it("over tolerance, sell limit order is refunded totally", async () => {
-      await exchangeInstance.initializeExchange(100000,{ from: LP1, value: 200000});
-    
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer1, value: 150}),
-                exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 100}),
-                exchangeInstance.OrderTokenToEth(1685175020, 350, false, { from: seller1}),
-                exchangeInstance.OrderTokenToEth(1685175020, 150, true, { from: seller2}),
-              ];
-      await Promise.all(process);
-      await time.advanceBlock();
-      let receipt = await exchangeInstance.OrderEthToToken(1685175020, 0, { from: buyer1, value: 10000});
-      
-      assert.equal(receipt.logs[0].args.Price, 501120238984316654,"Invalid price");
-      assert.equal(receipt.logs[0].args.refundRateBuy0, 0, "Invalid refundRate of buy order");
-      assert.equal(receipt.logs[0].args.refundRateBuy1, 0, "Invalid refundRate of buy limit order");
-      assert.equal(receipt.logs[0].args.refundRateSell0, 0, "Invalid refundRate of sell order");
-      assert.equal(receipt.logs[0].args.refundRateSell1, 1003000000000000000, "Invalid refundRate of sell limit order");
-      assert.equal(receipt.logs[1].args.ethpool, 199553, "Invalid baseToken Pool");
-      assert.equal(receipt.logs[1].args.tokenpool, 100224,  "Invalid settlementToken Pool");
-    })
-      
-    it("over secure rete, sell non-limit order refunded partially", async () => {
-      await exchangeInstance.initializeExchange(10000, { from: LP1, value: 20000});
-
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer1, value: 150}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 100}),
-        exchangeInstance.OrderTokenToEth(1685175020, 750, false, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 150, true, { from: seller2}),
-      ];
-      await Promise.all(process);
-      
-      await time.advanceBlock();
-      let receipt = await exchangeInstance.OrderEthToToken(1685175020, 0, { from: buyer1, value: 10000});
-      
-      assert.equal(receipt.logs[0].args.Price, 525000000000000000, "Invalid price");
-      assert.equal(receipt.logs[0].args.refundRateBuy0, 0, "Invalid refundRate of buy order");
-      assert.equal(receipt.logs[0].args.refundRateBuy1, 0, "Invalid refundRate of buy limit order");
-      assert.equal(receipt.logs[0].args.refundRateSell0, 156802333333333340, "Invalid refundRate of sell order");
-      assert.equal(receipt.logs[0].args.refundRateSell1, 1003000000000000000, "Invalid refundRate of sell limit order");
-      assert.equal(receipt.logs[1].args.ethpool, 19048, "Invalid baseToken Pool");
-      assert.equal(receipt.logs[1].args.tokenpool, 10501,  "Invalid settlementToken Pool");
-    })
-      
-    
-    it("over secure rete, buy non-limit order refunded partially", async () => {
-      await exchangeInstance.initializeExchange(10000, { from: LP1, value: 20000});
-
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer1, value: 1800}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 400}),
-        exchangeInstance.OrderTokenToEth(1685175020, 100, false, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 150, true, { from: seller2}),
-      ];
-      await Promise.all(process);
-      
-      await time.advanceBlock();
-      let receipt = await exchangeInstance.OrderEthToToken(1685175020, 0, { from: buyer1, value: 10000});
-      
-      assert.equal(receipt.logs[0].args.Price, 475000000000000000, "Invalid price");
-      assert.equal(receipt.logs[0].args.refundRateBuy0, 121415789473684210, "Invalid refundRate of buy order");
-      assert.equal(receipt.logs[0].args.refundRateBuy1, 1003000000000000000, "Invalid refundRate of buy limit order");
-      assert.equal(receipt.logs[0].args.refundRateSell0, 0, "Invalid refundRate of sell order");
-      assert.equal(receipt.logs[0].args.refundRateSell1, 0, "Invalid refundRate of sell limit order");
-      assert.equal(receipt.logs[1].args.ethpool, 21056, "Invalid baseToken Pool");
-      assert.equal(receipt.logs[1].args.tokenpool, 9500,  "Invalid settlementToken Pool");
-      })
-    
-   
-    it("buy limit order refunded totally2", async () => {
-      await exchangeInstance.initializeExchange(10000, { from: LP1, value: 20000});
-
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer1, value: 1500}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 400}),
-        exchangeInstance.OrderTokenToEth(1685175020, 100, false, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 150, true, { from: seller2}),
-      ];
-      await Promise.all(process);
-      
-      await time.advanceBlock();
-      let receipt = await exchangeInstance.OrderEthToToken(1685175020, 0, { from: buyer1, value: 10000});
-      
-      assert.equal(receipt.logs[0].args.Price, 476808905380333951 , "Invalid price");
-      assert.equal(receipt.logs[0].args.refundRateBuy0, 0, "Invalid refundRate of buy order");
-      assert.equal(receipt.logs[0].args.refundRateBuy1, 1003000000000000000, "Invalid refundRate of buy limit order");
-      assert.equal(receipt.logs[0].args.refundRateSell0, 0, "Invalid refundRate of sell order");
-      assert.equal(receipt.logs[0].args.refundRateSell1, 0, "Invalid refundRate of sell limit order");
-      assert.equal(receipt.logs[1].args.ethpool, 20976, "Invalid baseToken Pool");
-      assert.equal(receipt.logs[1].args.tokenpool, 9536,  "Invalid settlementToken Pool");
-      })
-    
-    it("sell limit order refunded totally2", async () => {
-      await exchangeInstance.initializeExchange(10000, { from: LP1, value: 20000});
-
-      let process = [exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer1, value: 150}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 100}),
-        exchangeInstance.OrderTokenToEth(1685175020, 500, false, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 150, true, { from: seller2}),
-      ];
-      await Promise.all(process);
-      
-      await time.advanceBlock();
-      let receipt = await exchangeInstance.OrderEthToToken(1685175020, 0, { from: buyer1, value: 10000});
-    
-      assert.equal(receipt.logs[0].args.Price, 518463810930576060, "Invalid price");
-        assert.equal(receipt.logs[0].args.refundRateBuy0, 0, "Invalid refundRate of buy order");
-        assert.equal(receipt.logs[0].args.refundRateBuy1, 0, "Invalid refundRate of buy limit order");
-        assert.equal(receipt.logs[0].args.refundRateSell0, 0, "Invalid refundRate of sell order");
-        assert.equal(receipt.logs[0].args.refundRateSell1, 1003000000000000000, "Invalid refundRate of sell limit order");
-        assert.equal(receipt.logs[1].args.ethpool, 19288, "Invalid baseToken Pool");
-        assert.equal(receipt.logs[1].args.tokenpool, 10370,  "Invalid settlementToken Pool");
-      })
    
   });
 
