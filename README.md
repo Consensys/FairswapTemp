@@ -12,6 +12,12 @@
 ![Ex3](./Explanations/Ex3.jpeg)
 ![Ex4](./Explanations/Ex4.jpeg)
 
+## Contracts
+- contracts/ExchangeFactory.sol => This contract launches a new exchange and manages exchanges.
+- contracts/BoxExchange.sol => Main contract. This contract records orders and executes them.
+- contracts/ShareToken.sol => the ERC20 like token that represents share in the exchange. This token is mintable and burnable from Exchange and uses DecimalSafeMath instead of SafeMath. This token has neither increaseAllowance() nor decreaseAllowance().
+- contracts/util/DecimalSafeMath.sol => This contract is almost same as @openzeppelin/contracts/math/SafeMath.sol, but DecimalSafeMath has decimalMul() and decimalDiv() which can calculate multiplication and division of numbers which have 18 digits after the decimal point.
+
 ## Some differences from other Fairswaps
 - Fee transfer to lien token is paid in both ETH and eth(iDOL)
 - Fee for lientoken can be transfered to lien token anytime
