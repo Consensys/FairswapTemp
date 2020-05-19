@@ -7,10 +7,10 @@
 
 
 ## Basic architecture of Fairswap
-![Ex1](./Explanations/Ex7.jpeg)
-![Ex2](./Explanations/Ex2.jpeg)
-![Ex3](./Explanations/Ex3.jpeg)
-![Ex4](./Explanations/Ex4.jpeg)
+![Ex1](./EX1/Ex7.jpeg)
+![Ex2](./EX2/Ex2.jpeg)
+![Ex3](./EX3/Ex3.jpeg)
+![Ex4](./EX4/Ex4.jpeg)
 
 ## Contracts
 - contracts/ExchangeFactory.sol => This contract launches a new exchange and manages exchanges.
