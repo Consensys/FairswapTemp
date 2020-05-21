@@ -69,16 +69,16 @@ contract BoxExchange {
     }
 
     /// STORAGE
-    mapping(uint256 => ExchangeBox) Exchange;
+    mapping(uint256 => ExchangeBox) private Exchange;
     bool private isSurplus;//if true, some orders are unexecuted yet.
-    uint32 private nextExecuteBoxNumber = 1;
-    uint32 private nextBoxNumber = 1;
-    uint256 private tokenPool;// pool of token(iDOL)
-    uint256 private ethPool;// pool of ETH
-    uint256 private ethForLien;//amount of ETH for Lien token
-    uint256 private tokenForLien;//amount of token for Lien token
-    address private tokenAddress;
-    address payable private lienTokenAddress;
+    uint32 internal nextExecuteBoxNumber = 1;
+    uint32 internal nextBoxNumber = 1;
+    uint256 public tokenPool;// pool of token(iDOL)
+    uint256 public ethPool;// pool of ETH
+    uint256 public ethForLien;//amount of ETH for Lien token
+    uint256 public tokenForLien;//amount of token for Lien token
+    address public tokenAddress;
+    address payable public lienTokenAddress;
 
     ShareToken share;
     IERC20 token;
@@ -127,7 +127,7 @@ contract BoxExchange {
     * @dev if _isLimit is true and ethPool/tokenPool * 0.999 < Price, the order will be executed, otherwise ETH will be refunded
     * @dev if _isLimit is false and ethPool/tokenPool * 0.95 < Price, the order will be executed, otherwise ETH will be refunded
     **/
-    function OrderEthToToken(uint256 _timeout, bool _isLimit) external payable {
+    function orderEthToToken(uint256 _timeout, bool _isLimit) external payable {
         require(_timeout > nextBoxNumber, "Time out"); 
         require(msg.value > 0, "Amount should bigger than 0");
 
@@ -185,7 +185,7 @@ contract BoxExchange {
     * @dev if _isLimit is true and ethPool/tokenPool * 1.001 > Price, the order will be executed, otherwise token will be refunded
     * @dev if _isLimit is false and when ethPool/tokenPool * 1.01 > Price, the order will be executed, otherwise token will be refunded
     **/
-    function OrderTokenToEth(uint256 _timeout, uint256 _tokenAmount, bool _isLimit) external {
+    function orderTokenToEth(uint256 _timeout, uint256 _tokenAmount, bool _isLimit) external {
         require(_tokenAmount > 0, "Amount should bigger than 0");
         require(_timeout > nextBoxNumber, "Time out");
          if (Exchange[nextBoxNumber - 1].blockNumber != 0 && Exchange[nextBoxNumber - 1].blockNumber + 1 >= block.number) {
@@ -315,7 +315,7 @@ contract BoxExchange {
         uint256 _tokenForLien = tokenForLien;
         ethForLien = 0;
         tokenForLien = 0;
-        _transferETH(lienTokenAddress, _ethForLien);
+        lienTokenAddress.transfer(_ethForLien);
         require(token.transfer(lienTokenAddress, _tokenForLien), "could not send token to lien");
     }
 
@@ -695,20 +695,12 @@ contract BoxExchange {
             share.totalSupply(), ethPool.div(share.totalSupply()), tokenPool.div(share.totalSupply()), buyPrice, sellPrice);
     }
 
+    function getShareTokenAddress() external view returns (address) {
+        return address(share);
+    }
+
     function getShare(address user) external view returns (uint256) {
         return share.balanceOf(user);
-    }
-    
-    function getTokenAddress() external view returns (address) {
-        return tokenAddress;
-    }
-
-    function getTotalShare() external view returns (uint256) {
-        return share.totalSupply();
-    }
-
-    function getPoolAmount() external view returns (uint256, uint256) {
-        return (ethPool, tokenPool);
     }
 
     function getBoxSummary()
@@ -759,10 +751,6 @@ contract BoxExchange {
         
             return (user, Exchange[nextExecuteBoxNumber].sellOrders[user]);
         }
-    }
-
-    function getTokensForLien() external view returns (uint256, uint256) {
-        return(ethForLien, tokenForLien);
     }
 
 }

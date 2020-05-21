@@ -26,31 +26,31 @@ contract('BoxExchange', function(accounts) {
       await exchangeInstance.initializeExchange(1600000, { from: LP1, value: 2400000});
     
       let process = [
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: LP1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, {from: buyer1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: LP2, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer2, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: LP1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: LP2, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, { from: LP1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, {from: buyer1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, { from: LP2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, { from: buyer2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: LP1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: buyer1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: LP2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: buyer2, value: 1000}),
         
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller2}), //execute till this order in the first execution
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller3}),
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller4}),  
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller2}),
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller3}),
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller4}),
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller1}),
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller2}), //execute till this order in the first execution
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller3}),
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller4}),  
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller1}),
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller2}),
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller3}),
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller4}),
               ];
       await Promise.all(process);
         
       await time.advanceBlock();
       await time.advanceBlock();
       
-      let process2 = [exchangeInstance.OrderEthToToken(1685175020, false, {from: buyer1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer2, value: 1000})
+      let process2 = [exchangeInstance.orderEthToToken(1685175020, false, {from: buyer1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, { from: buyer2, value: 1000})
       ]
       await Promise.all(process2);       
       
@@ -64,35 +64,35 @@ contract('BoxExchange', function(accounts) {
       await exchangeInstance.initializeExchange(1600000,{ from: LP1, value: 2400000});
     
       let process = [
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: LP1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, {from: buyer1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: LP2, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer2, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: LP1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: LP2, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, { from: LP1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, {from: buyer1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, { from: LP2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, { from: buyer2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: LP1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: buyer1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: LP2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: buyer2, value: 1000}),
         
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller2}), //execute till this order in the first execution
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller3}),
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller4}),  
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller2}),
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller3}),
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller4}),
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller1}),
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller2}), //execute till this order in the first execution
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller3}),
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller4}),  
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller1}),
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller2}),
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller3}),
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller4}),
               ];
       await Promise.all(process);
       await time.advanceBlock();
 
-      let receipt = await exchangeInstance.OrderTokenToEth(1685175020, 100, false, { from: seller2});
+      let receipt = await exchangeInstance.orderTokenToEth(1685175020, 100, false, { from: seller2});
       assert.equal(receipt.logs[2].args.Price, 4, "`length` for buyorder is invalid"); 
       assert.equal(receipt.logs[2].args.refundRateBuy0,4, "`length` for buyorder Limit is invalid"); 
       assert.equal(receipt.logs[2].args.refundRateBuy1, 2, "`length` for sellorder is invalid"); 
       assert.equal(receipt.logs[2].args.refundRateSell0, 0, "`length` for sellorder limit is invalid"); 
       assert.equal(receipt.logs[2].args.refundRateSell1, 3, "unexecuted category is invalid"); 
     
-      receipt = await exchangeInstance.OrderEthToToken(1685175020, false, {from: buyer1, value: 1000});
+      receipt = await exchangeInstance.orderEthToToken(1685175020, false, {from: buyer1, value: 1000});
       assert.equal(receipt.logs[2].args.Price, 0, "`length` for buyorder is invalid"); 
       assert.equal(receipt.logs[2].args.refundRateBuy0, 0, "`length` for buyorder Limit is invalid"); 
       assert.equal(receipt.logs[2].args.refundRateBuy1, 2, "`length` for sellorder is invalid"); 
@@ -104,30 +104,30 @@ contract('BoxExchange', function(accounts) {
       await exchangeInstance.initializeExchange(1600000,{ from: LP1, value: 2400000});
     
       let process = [
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: LP1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, {from: buyer1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: LP2, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer2, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer3, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: LP1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer1, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: LP2, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 1000}),
-        exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer3, value: 1000}), //execute till this order in the first execution
+        exchangeInstance.orderEthToToken(1685175020, false, { from: LP1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, {from: buyer1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, { from: LP2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, { from: buyer2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, false, { from: buyer3, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: LP1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: buyer1, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: LP2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: buyer2, value: 1000}),
+        exchangeInstance.orderEthToToken(1685175020, true, { from: buyer3, value: 1000}), //execute till this order in the first execution
         
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller2}),
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller3}),
-        exchangeInstance.OrderTokenToEth(1685175020, 160, false, { from: seller4}),  
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller1}),
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller2}),
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller3}),
-        exchangeInstance.OrderTokenToEth(1685175020, 1600, true, { from: seller4}),
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller1}),
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller2}),
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller3}),
+        exchangeInstance.orderTokenToEth(1685175020, 160, false, { from: seller4}),  
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller1}),
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller2}),
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller3}),
+        exchangeInstance.orderTokenToEth(1685175020, 1600, true, { from: seller4}),
               ];
       await Promise.all(process);
         
       await time.advanceBlock();
-      let receipt = await exchangeInstance.OrderEthToToken(1685175020, false, {from: buyer1, value: 1000});
+      let receipt = await exchangeInstance.orderEthToToken(1685175020, false, {from: buyer1, value: 1000});
       
       assert.equal(receipt.logs[2].args.Price, 5, "`length` for buyorder is invalid"); 
       assert.equal(receipt.logs[2].args.refundRateBuy0, 5, "`length` for buyorder Limit is invalid"); 
@@ -147,34 +147,34 @@ contract('BoxExchange', function(accounts) {
     await exchangeInstance.initializeExchange(1600000,{ from: LP1, value: 2400000});
   
     let process = [
-      exchangeInstance.OrderEthToToken(1685175020, false, { from: LP1, value: 1000}),
-      exchangeInstance.OrderEthToToken(1685175020, false, { from: LP2, value: 1000}),
-      exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer1, value: 1000}),
-      exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer2, value: 1000}),
-      exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer3, value: 1000}),
-      exchangeInstance.OrderEthToToken(1685175020, true, { from: LP1, value: 1000}),
-      exchangeInstance.OrderEthToToken(1685175020, true, { from: LP2, value: 1000}),
-      exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer1, value: 1000}),
-      exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: 1000}),
-      exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer3, value: 1000}), //execute till this order in the first execution
+      exchangeInstance.orderEthToToken(1685175020, false, { from: LP1, value: 1000}),
+      exchangeInstance.orderEthToToken(1685175020, false, { from: LP2, value: 1000}),
+      exchangeInstance.orderEthToToken(1685175020, false, { from: buyer1, value: 1000}),
+      exchangeInstance.orderEthToToken(1685175020, false, { from: buyer2, value: 1000}),
+      exchangeInstance.orderEthToToken(1685175020, false, { from: buyer3, value: 1000}),
+      exchangeInstance.orderEthToToken(1685175020, true, { from: LP1, value: 1000}),
+      exchangeInstance.orderEthToToken(1685175020, true, { from: LP2, value: 1000}),
+      exchangeInstance.orderEthToToken(1685175020, true, { from: buyer1, value: 1000}),
+      exchangeInstance.orderEthToToken(1685175020, true, { from: buyer2, value: 1000}),
+      exchangeInstance.orderEthToToken(1685175020, true, { from: buyer3, value: 1000}), //execute till this order in the first execution
       
-      exchangeInstance.OrderTokenToEth(1685175020, 1600, false, { from: LP1}),
-      exchangeInstance.OrderTokenToEth(1685175020, 1600, false, { from: LP2}), 
-      exchangeInstance.OrderTokenToEth(1685175020, 1600, false, { from: seller1}), 
-      exchangeInstance.OrderTokenToEth(1685175020, 1600, false, { from: seller2}),
-      exchangeInstance.OrderTokenToEth(1685175020, 1600, false, { from: seller3}),
-      exchangeInstance.OrderTokenToEth(1685175020, 1600, false, { from: seller4}), 
-      exchangeInstance.OrderTokenToEth(1685175020, 160, true, { from: LP1}),
-      exchangeInstance.OrderTokenToEth(1685175020, 160, true, { from: LP2}),
-      exchangeInstance.OrderTokenToEth(1685175020, 160, true, { from: seller1}),
-      exchangeInstance.OrderTokenToEth(1685175020, 160, true, { from: seller2}),//execute till this order in the second execution
-      exchangeInstance.OrderTokenToEth(1685175020, 160, true, { from: seller3}),
-      exchangeInstance.OrderTokenToEth(1685175020, 160, true, { from: seller4}),
+      exchangeInstance.orderTokenToEth(1685175020, 1600, false, { from: LP1}),
+      exchangeInstance.orderTokenToEth(1685175020, 1600, false, { from: LP2}), 
+      exchangeInstance.orderTokenToEth(1685175020, 1600, false, { from: seller1}), 
+      exchangeInstance.orderTokenToEth(1685175020, 1600, false, { from: seller2}),
+      exchangeInstance.orderTokenToEth(1685175020, 1600, false, { from: seller3}),
+      exchangeInstance.orderTokenToEth(1685175020, 1600, false, { from: seller4}), 
+      exchangeInstance.orderTokenToEth(1685175020, 160, true, { from: LP1}),
+      exchangeInstance.orderTokenToEth(1685175020, 160, true, { from: LP2}),
+      exchangeInstance.orderTokenToEth(1685175020, 160, true, { from: seller1}),
+      exchangeInstance.orderTokenToEth(1685175020, 160, true, { from: seller2}),//execute till this order in the second execution
+      exchangeInstance.orderTokenToEth(1685175020, 160, true, { from: seller3}),
+      exchangeInstance.orderTokenToEth(1685175020, 160, true, { from: seller4}),
             ];
     await Promise.all(process);
     await time.advanceBlock();
     await time.advanceBlock();
-    let receipt = await exchangeInstance.OrderEthToToken(1685175020,false, {from: buyer1, value: 1000});
+    let receipt = await exchangeInstance.orderEthToToken(1685175020,false, {from: buyer1, value: 1000});
     
     assert.equal(receipt.logs[2].args.Price, 5, "`length` for buyorder is invalid"); 
     assert.equal(receipt.logs[2].args.refundRateBuy0, 5, "`length` for buyorder Limit is invalid"); 
@@ -207,16 +207,16 @@ it("execute collectly after excuteUnexecutedBox()", async () => {
     await exchangeInstance.initializeExchange(1000000,{ from: LP1, value: eth});
   
     let process = [
-      exchangeInstance.OrderEthToToken(1685175020, false, {from: buyer1, value: eth1}),
-      exchangeInstance.OrderEthToToken(1685175020, false, { from: buyer2, value: eth1}),
-      exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer2, value: eth2}),
-      exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer1, value: eth2})];
+      exchangeInstance.orderEthToToken(1685175020, false, {from: buyer1, value: eth1}),
+      exchangeInstance.orderEthToToken(1685175020, false, { from: buyer2, value: eth1}),
+      exchangeInstance.orderEthToToken(1685175020, true, { from: buyer2, value: eth2}),
+      exchangeInstance.orderEthToToken(1685175020, true, { from: buyer1, value: eth2})];
     await Promise.all(process);
       
     await time.advanceBlock();
     let receipt = await exchangeInstance.excuteUnexecutedBox({from: factory});
     await time.advanceBlock();
-    receipt = await exchangeInstance.OrderEthToToken(1685175020, true, { from: buyer1, value: eth2});
+    receipt = await exchangeInstance.orderEthToToken(1685175020, true, { from: buyer1, value: eth2});
     assert.equal(receipt.logs.length, 1, "execution should not be occured");
     assert.equal(receipt.logs[0].args.boxNumber, 3, "execution should not be occured");
   });  
