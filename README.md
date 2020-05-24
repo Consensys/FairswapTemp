@@ -15,23 +15,12 @@
 ## Contracts
 - contracts/ExchangeFactory.sol => This contract launches a new exchange and manages exchanges.
 - contracts/BoxExchange.sol => Main contract. This contract records orders and executes them.
-- contracts/ShareToken.sol => the ERC20 like token that represents share in the exchange. This token is mintable and burnable from Exchange and uses DecimalSafeMath instead of SafeMath. This token has neither increaseAllowance() nor decreaseAllowance().
-- contracts/util/DecimalSafeMath.sol => This contract is almost same as @openzeppelin/contracts/math/SafeMath.sol, but DecimalSafeMath has decimalMul() and decimalDiv() which can calculate multiplication and division of numbers which have 18 digits after the decimal point.
+- contracts/ShareToken.sol => the ERC20 token that represents share in the exchange. 
+- contracts/util/DecimalSafeMath.sol => This contract has decimalMul() and decimalDiv() which can calculate multiplication and division of numbers which have 18 digits after the decimal point.
 
 ## Some differences from other Fairswaps
 - Fee transfer to lien token is paid in both ETH and eth(iDOL)
 - Fee for lientoken can be transfered to lien token anytime
-
-## Point of Audit
-- Fairswap is different from other DEX like uniswap in the process of price determination and the order execution. 
-- In Fairswap, some attacks for transferring tokens or ETH such as Reentrancy attacks because the submission of orders and the executions are split in two or more transactions.
-- The points of the audit are the following;
-    1. If it is possible to execute one order more than twice and/or to omit executions of some orders
-    2. If some attacks could be conducted which force the contract to calculate invalid price or refundrate?
-    3. If some attacks could be conducted to let the contract submits and registers invalid orders?
-    4. Gas optimization
-- Please use price_calculator.xlsx to calculate price, refund rate and fee.(The results may be a little different from those from contracts)
-
 
 ## Test
 - When you execute testing, please try using ganache-cli -b 1 to execute Promise.all(orders)
