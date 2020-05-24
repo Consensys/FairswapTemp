@@ -99,7 +99,6 @@ The analysis was completed successfully. No issues were detected.
 - function getExchangeData() external view returns 
 (uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256)
 - function getShare(address user) external view returns (uint256)
-- getShareTokenAddress() external view returns (address)
 - function getBoxSummary() external view 
                         returns (uint256, uint256, uint256, uint256)
 - function getBuyerdata(uint256 place, bool _isLimit) external view
