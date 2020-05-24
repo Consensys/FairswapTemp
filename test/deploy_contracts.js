@@ -10,8 +10,6 @@ let setting = async function(accounts)  {
     let receipt = await factoryInstance.launchExchange(tokenInstance.address, { from: accounts[0] });
     let tokenAddress = receipt.logs[0].args.token;
     let exchangeInstance = await BoxExchange.at(receipt.logs[0].args.exchange);
-    let shareAddress = await exchangeInstance.getShareTokenAddress.call();
-    let shareInstance = await TestToken.at(shareAddress)
     await tokenInstance.transfer(seller1, 2000000, { from: factory });
     await tokenInstance.transfer(seller2, 2000000, { from: factory });
     await tokenInstance.transfer(seller3, 2000000, { from: factory });
@@ -25,7 +23,7 @@ let setting = async function(accounts)  {
     await tokenInstance.approve(exchangeInstance.address, 2000000, { from: seller3});
     await tokenInstance.approve(exchangeInstance.address, 2000000, { from: seller4});
 
-    return {exchangeInstance, tokenInstance, lientokenInstance, shareInstance};
+    return {exchangeInstance, tokenInstance, lientokenInstance, factoryInstance};
   }
 
   module.exports = {
